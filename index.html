@@ -190,7 +190,7 @@
     <button type="button" class="btn-confirm" onclick="doSearch()">확인</button>
     <button type="button" class="btn-reset" onclick="clearSearch()">초기화</button>
   </div>
-  <div class="search-note">※ 라인업은 추후 업데이트 예정 — 지금은 선수 정보(등번호·학교·생년월일) 조회만 가능합니다.</div>
+  <div class="search-note">※ 경기 카드를 누르면 수비 라인업이 표시됩니다. 선수 이름을 누르면 상세 정보를 볼 수 있습니다.</div>
   <div class="stats" id="stats"></div>
   <div class="sec">화정 경기 일정</div>
   <div class="search-info" id="searchInfo"></div>
@@ -246,6 +246,10 @@ const ROSTER = {
   '정은우':{num:'28',school:'수완초',birth:'17.04.11'},
   '정지후':{num:'0',school:'화정남초',birth:'17.12.17'},
   '정현우':{num:'22',school:'수완초',birth:'15.02.20'},
+  '송유준':{num:'',school:'',birth:''},
+  '박윤건':{num:'',school:'',birth:''},
+  '지일우':{num:'',school:'',birth:''},
+  '이서준':{num:'',school:'',birth:''},
   '최민후':{num:'83',school:'마지초등',birth:'18.10.31'},
   '하유성':{num:'87',school:'화정남초',birth:'17.07.13'},
   '하준우':{num:'92',school:'화정남초',birth:'17.01.11'},
@@ -269,7 +273,15 @@ const T = {
     {id:'g5',date:'9/13',dow:'일',time:'12:30~14:00',hour:12,cat:'유소년',venue:'통영야구장', left:'목포시',right:'화정'},
     {id:'g6',date:'9/13',dow:'일',time:'15:30~16:50',hour:15,cat:'새싹', venue:'산양스포츠파크 제2구장',left:'광주북구',right:'화정'},
   ],
-  lineups:{ g1:{}, g2:{}, g3:{}, g4:{}, g5:{}, g6:{} }
+  coaches:{ '새싹':'오철희 · 유승범 · 강기백', '꿈나무':'오철희 · 신준원 · 강기백', '유소년':'오철희 · 송은상' },
+  lineups:{
+    g1:{CF:'나준완',LF:'이도하',RF:'고준석',SS:'유수완',B2:'임서준',B3:'박윤건',SP:'정지후',B1:'장유준',C:'지일우',EH:'강은찬'},
+    g2:{CF:'심연후',LF:'강주찬',RF:'이서준',SS:'김세린',B2:'오유찬(54)',B3:'신수호',SP:'석훈빈',B1:'김현승',C:'송유준',EH:'유수완'},
+    g3:{CF:'서승원',LF:'이우영',RF:'노현서',SS:'오유빈',B2:'서주원',B3:'송지율',SP:'장민준',B1:'김선균',C:'김동유',EH:'오유찬(7)'},
+    g4:{CF:'김세린',LF:'신수호',RF:'이서준',SS:'석훈빈',B2:'심연후',B3:'오유찬(54)',SP:'송유준',B1:'강주찬',C:'김현승',EH:'장유준'},
+    g5:{CF:'서승원',LF:'장민준',RF:'노현서',SS:'오유찬(7)',B2:'이우영',B3:'송지율',SP:'김동유',B1:'김선균',C:'서주원',EH:'오유빈'},
+    g6:{CF:'고준석',LF:'정지후',RF:'이도하',SS:'장유준',B2:'강은찬',B3:'박윤건',SP:'임서준',B1:'지일우',C:'유수완',EH:'나준완'}
+  }
 };
 const POS = [
   {key:'CF',label:'CF 중견',x:50,y:6, cls:''},
@@ -283,7 +295,7 @@ const POS = [
   {key:'EH',label:'',x:86,y:84,cls:'extra'},
   {key:'C', label:'C 포수', x:50,y:87,cls:'catcher'},
 ];
-let filt='전체', wxCache={};
+let filt='전체', wxCache={}, sel=null;
 function closeGame(e){if(e&&e.target!==document.getElementById('gov'))return;document.getElementById('gov').classList.remove('open');}
 function closePl(){document.getElementById('plov').classList.remove('open');}
 function closeVp(){document.getElementById('vpov').classList.remove('open');}
@@ -298,8 +310,9 @@ function openVp(name,e){
 }
 function showPl(key,posLabel){
   const p=ROSTER[key];
-  document.getElementById('mAv').textContent=key.slice(0,1);
-  document.getElementById('mName').textContent=key;
+  const disp=key.replace(/\(\d+\)$/,'');
+  document.getElementById('mAv').textContent=disp.slice(0,1);
+  document.getElementById('mName').textContent=disp;
   document.getElementById('mNum').textContent=(p&&p.num)?`#${p.num}${posLabel?' · '+posLabel:''}`:(posLabel||'');
   const rows=[];
   if(p&&p.num)rows.push({l:'등번호',v:`#${p.num}`});
@@ -355,19 +368,35 @@ function applyWx(){
     el.className='wx '+cls; el.textContent=`${icon} ${label}`;
   });
 }
+function playerGames(key){
+  return T.games.filter(g=>Object.values(T.lineups[g.id]||{}).includes(key));
+}
+function selectPlayer(key){
+  sel = key;
+  const disp = key.replace(/\(\d+\)$/,'');
+  const gs = playerGames(key);
+  const infoEl = document.getElementById('searchInfo');
+  document.getElementById('searchCand').innerHTML='';
+  infoEl.className='search-info show';
+  infoEl.innerHTML = gs.length
+    ? `<b>${disp}</b> 선수 출전 경기 ${gs.length}건만 표시 중 · <span class="mlink" onclick="showPl('${key}','')">선수 정보 보기</span>`
+    : `<b>${disp}</b> 선수가 배정된 경기가 없습니다 · <span class="mlink" onclick="showPl('${key}','')">선수 정보 보기</span>`;
+  renderGames();
+}
 function doSearch(){
   const term = document.getElementById('playerSearch').value.trim();
   const infoEl = document.getElementById('searchInfo');
   const candEl = document.getElementById('searchCand');
   candEl.innerHTML='';
-  if(!term){ infoEl.className='search-info'; infoEl.textContent=''; return; }
-  const matches = Object.keys(ROSTER).filter(n=>n.includes(term)).sort();
+  if(!term){ clearSearch(); return; }
+  const matches = Object.keys(ROSTER).filter(n=>n.replace(/\(\d+\)$/,'').includes(term)).sort();
   if(matches.length===0){
+    sel=null; renderGames();
     infoEl.className='search-info show'; infoEl.textContent=`"${term}" 검색 결과 없음`;
   } else if(matches.length===1){
-    infoEl.className='search-info'; infoEl.textContent='';
-    showPl(matches[0],'');
+    selectPlayer(matches[0]);
   } else {
+    sel=null; renderGames();
     infoEl.className='search-info show';
     infoEl.textContent=`"${term}" 검색 · 동명이인 ${matches.length}명 — 선수를 선택하세요`;
     candEl.innerHTML = `
@@ -377,17 +406,20 @@ function doSearch(){
           ${matches.map(name=>{
             const p = ROSTER[name] || {};
             const num = p.num ? `#${p.num}` : '';
-            return `<button class="cand-btn" onclick="showPl('${name}','')"><span>${name}</span><span class="cand-num">${num}</span></button>`;
+            const cnt = playerGames(name).length;
+            return `<button class="cand-btn" onclick="selectPlayer('${name}')"><span>${name.replace(/\(\d+\)$/,'')} <span style="font-size:12px;color:#6b7280;font-weight:500">${cnt}경기</span></span><span class="cand-num">${num}</span></button>`;
           }).join('')}
         </div>
       </div>`;
   }
 }
 function clearSearch(){
+  sel=null;
   document.getElementById('playerSearch').value='';
   document.getElementById('searchInfo').className='search-info';
-  document.getElementById('searchInfo').textContent='';
+  document.getElementById('searchInfo').innerHTML='';
   document.getElementById('searchCand').innerHTML='';
+  renderGames();
 }
 function renderAll(){
   const days=[...new Set(T.games.map(g=>g.date))].length;
@@ -411,9 +443,13 @@ function renderFilters(){
 }
 function setFilt(f){filt=f;renderFilters();renderGames();}
 function renderGames(){
-  const filtered = filt==='전체' ? T.games : T.games.filter(g=>g.cat===filt);
+  let filtered = filt==='전체' ? T.games : T.games.filter(g=>g.cat===filt);
+  if(sel) filtered = filtered.filter(g=>Object.values(T.lineups[g.id]||{}).includes(sel));
   if(filtered.length===0){
-    document.getElementById('glist').innerHTML = `<div class="empty-msg">해당 부문 경기가 없습니다.</div>`;
+    const msg = sel
+      ? `${sel.replace(/\(\d+\)$/,'')} 선수의 해당 조건 경기가 없습니다.<br><span class="mlink" onclick="clearSearch()">전체 경기 보기</span>`
+      : '해당 부문 경기가 없습니다.';
+    document.getElementById('glist').innerHTML = `<div class="empty-msg">${msg}</div>`;
     return;
   }
   const byDate = {};
@@ -423,6 +459,13 @@ function renderGames(){
     <div class="gcards">${gs.map(g=>{
       const isH = g.right==='화정';
       const vurl = T.venues[g.venue]?.url || '#';
+      let posTag='';
+      if(sel){
+        const lu=T.lineups[g.id]||{};
+        const pk=Object.keys(lu).find(k=>lu[k]===sel);
+        const pl=POS.find(p=>p.key===pk);
+        if(pl) posTag=`<span class="sb" style="background:#e0f2fe;color:#075985;border:.5px solid #7dd3fc">${pl.label||'EH'}</span>`;
+      }
       return`<div class="gcard" onclick="openGame('${g.id}')">
         <div class="gtop">
           <div class="gm">${g.left==='화정'?'<span class="hj">화정</span>':g.left}<span class="vs"> vs </span>${g.right==='화정'?'<span class="hj">화정</span>':g.right}</div>
@@ -434,6 +477,7 @@ function renderGames(){
           <div class="tbadge"><span>${g.time}</span></div>
           <span class="spacer"></span>
           <span id="wx${g.id}" class="wx load">⏳</span>
+          ${posTag}
           <span class="sb ${isH?'home':'away'}">${isH?'홈':'원정'}</span>
           <span class="cb c${g.cat}">${g.cat}</span>
         </div>
@@ -450,8 +494,10 @@ function openGame(id){
   if(hasLineup){
     const nodes = POS.filter(p=>!(p.key==='EH'&&!lu[p.key])).map(p=>{
       const key = lu[p.key] || '';
+      const disp = key.replace(/\(\d+\)$/,'');
+      const num = ROSTER[key] && ROSTER[key].num ? `#${ROSTER[key].num}` : '';
       return`<div class="pnode ${p.cls}" style="left:${p.x}%;top:${p.y}%" onclick="showPl('${key}','${p.label}')">
-        <div class="pname">${key}</div><div class="ppos">${p.label}</div></div>`;
+        <div class="pname">${disp}${num?`<span style="font-size:9px;color:#777;font-weight:500"> ${num}</span>`:''}</div><div class="ppos">${p.label}</div></div>`;
     }).join('');
     fieldHtml = `
       <div class="field">
@@ -479,7 +525,7 @@ function openGame(id){
     <div class="meta">
       <a href="${vurl}" target="_blank" class="mlink" onclick="event.stopPropagation()">📍 ${g.venue}</a>
       <span>·</span><span>화정 ${g.right==='화정'?'홈':'원정'}</span>
-      <span>·</span><span>통영시장배</span>
+      <span>·</span><span>👤 ${T.coaches[g.cat]||''}</span>
     </div>
     ${fieldHtml}`;
   document.getElementById('gov').classList.add('open');
