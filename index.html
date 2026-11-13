@@ -77,6 +77,9 @@
   .like:active{transform:scale(.93)}
   .like.bump svg{animation:bump .4s}
   @keyframes bump{40%{transform:scale(1.45)}}
+  .dl{flex:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 8px;border-radius:12px;border:1.5px solid rgba(255,255,255,.3);color:var(--text);text-decoration:none;font-size:11px;font-weight:700;white-space:nowrap}
+  .dl svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .dl:active{background:var(--accent);border-color:var(--accent)}
   .seek{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums}
   input[type=range]{flex:1;appearance:none;-webkit-appearance:none;height:22px;background:transparent;cursor:pointer}
   input[type=range]::-webkit-slider-runnable-track{height:5px;border-radius:3px;background:linear-gradient(90deg,var(--gold) var(--p,0%),rgba(255,255,255,.2) var(--p,0%))}
@@ -168,6 +171,7 @@
     <div class="row">
       <button class="pp" id="pp" aria-label="재생/일시정지"><svg viewBox="0 0 24 24" id="ppIcon"><path d="M6 4l14 8-14 8z"/></svg></button>
       <div class="meta"><b id="mTitle"></b><small id="mSub"></small></div>
+      <a class="dl" id="dl" href="#" download><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span>원음 받기</span></a>
     </div>
     <div class="seek"><span id="cur">0:00</span><input type="range" id="seek" min="0" max="100" step="0.1" value="0" aria-label="재생 위치"><span id="dur">0:00</span></div>
     <button class="like" id="like" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.6-9.3-9.2C1.4 7.800 3.500 4.500 6.900 4.500c2 0 3.700 1.100 5.100 3 1.400-1.900 3.100-3 5.100-3 3.400 0 5.500 3.300 4.200 6.800-1.800 4.600-9.300 9.200-9.300 9.200z"/></svg><span id="likeT">좋아요</span><span id="likeN">0</span></button>
@@ -603,7 +607,9 @@ function selectSong(s){
   if (changed){ audio.pause(); audio.src = s.src; lineIdx = -2; $("ppIcon").innerHTML = PLAY; $("bigplay").classList.remove("hide"); $("seek").value = 0; paintSeek(); $("cur").textContent = "0:00"; $("likeHint").textContent = ""; }
   document.documentElement.style.setProperty("--accent", colorOf(s)); document.documentElement.style.setProperty("--accent-glow", colorOf(s) + "8c");
   const si = SONGS.indexOf(s); $("prevSong").disabled = si === 0; $("nextSong").disabled = si === SONGS.length - 1;
-  $("badgeNo").textContent = si + 1; $("badgeStyle").textContent = s.style; $("mTitle").textContent = s.title + " · " + s.style; $("mSub").textContent = "화정초 야구부 응원가";
+  $("badgeNo").textContent = si + 1;
+  $("dl").href = s.src; $("dl").setAttribute("download", "화정응원가_후보" + (si + 1) + "_" + s.style.replace(/\s+/g, "_") + ".mp3");
+  $("dl").setAttribute("aria-label", s.title + " 원음 MP3 내려받기"); $("badgeStyle").textContent = s.style; $("mTitle").textContent = s.title + " · " + s.style; $("mSub").textContent = "화정초 야구부 응원가";
   buildFull(); renderSongs(); renderLike(); renderComments(); renderLine(true); syncShow();
 }
 
