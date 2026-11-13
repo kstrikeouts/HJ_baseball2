@@ -33,23 +33,28 @@
   .sample{font-size:clamp(12px,3.3vw,14px);font-weight:700;color:#2a1200;background:var(--gold);padding:3px 10px;border-radius:999px}
 
   /* stage: photo + lyrics */
-  .stage{position:relative;aspect-ratio:3/2;border-radius:18px;overflow:hidden;background:#000;box-shadow:0 18px 50px rgba(0,0,0,.55);border:1px solid var(--line)}
+  .stage{position:relative;aspect-ratio:3/2;border-radius:0 0 18px 18px;overflow:hidden;background:#000;box-shadow:0 18px 50px rgba(0,0,0,.55);border:1px solid var(--line)}
   .slide{position:absolute;inset:0;background-size:cover;background-position:center 35%;opacity:0;transition:opacity .55s ease;transform:scale(1.02)}
   .slide.on{opacity:1;animation:drift 3s ease-out forwards}
   @keyframes drift{from{transform:scale(1.02)}to{transform:scale(1.09)}}
-  .stage::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.28) 0%,rgba(0,0,0,0) 26%,rgba(0,0,0,0) 40%,rgba(10,3,3,.72) 72%,rgba(10,3,3,.95) 100%);pointer-events:none}
-  .badge{position:absolute;top:0;left:0;z-index:4;pointer-events:none;display:flex;align-items:center;gap:10px;padding:12px 22px 12px 16px;background:var(--accent);border-radius:0 0 22px 0;transition:background .3s;box-shadow:0 4px 18px rgba(0,0,0,.5)}
-  .badge small{font-family:var(--display);font-size:clamp(21px,6vw,32px);line-height:1}
-  .badge b{font-family:var(--display);font-weight:400;font-size:clamp(48px,14vw,80px);line-height:.85;color:var(--gold)}
-  .badge i{font-style:normal;font-size:clamp(15px,4.4vw,22px);font-weight:700;padding-left:12px;border-left:1.5px solid rgba(255,255,255,.45);line-height:1.25}
-  .lyrics{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:0 16px 16px;text-align:center}
-  .now{font-family:var(--display);font-size:clamp(21px,6.2vw,44px);line-height:1.2;text-shadow:0 2px 14px rgba(0,0,0,.85);min-height:1.2em;word-break:keep-all}
+  .stage::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,0) 48%,rgba(10,3,3,.7) 76%,rgba(10,3,3,.94) 100%);pointer-events:none}
+  .mvbar{display:flex;align-items:center;gap:10px;padding:8px 8px 8px 14px;background:var(--accent);border-radius:18px 18px 0 0;transition:background .3s}
+  .mvbar .lbl{display:flex;align-items:baseline;gap:6px;flex:none}
+  .mvbar small{font-family:var(--display);font-size:clamp(18px,5vw,24px);line-height:1}
+  .mvbar b{font-family:var(--display);font-weight:400;font-size:clamp(34px,10vw,46px);line-height:.85;color:var(--gold)}
+  .mvbar i{flex:1;min-width:0;font-style:normal;font-size:clamp(15px,4.4vw,20px);font-weight:700;padding-left:10px;border-left:1.5px solid rgba(255,255,255,.45);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mvbar .nav{flex:none;display:flex;gap:6px}
+  .mvbar .nav button{width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.22);display:grid;place-items:center}
+  .mvbar .nav button:disabled{opacity:.3}
+  .mvbar .nav svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+  .lyrics{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:0 12px 10px;text-align:center}
+  .now{font-family:var(--display);font-size:clamp(20px,5.8vw,44px);line-height:1.2;text-shadow:0 2px 14px rgba(0,0,0,.85);min-height:1.2em;word-break:keep-all}
   .now.pop{animation:pop .32s cubic-bezier(.2,1.4,.4,1)}
-  .now.shout{color:var(--gold);font-size:clamp(30px,9vw,64px);letter-spacing:.06em}
+  .now.shout{color:var(--gold);font-size:clamp(28px,8.4vw,64px);letter-spacing:.06em}
   @keyframes pop{from{transform:translateY(10px) scale(.94);opacity:0}to{transform:none;opacity:1}}
-  .next{margin-top:6px;font-size:clamp(12px,3.4vw,17px);color:var(--dim);min-height:1.4em;text-shadow:0 1px 8px rgba(0,0,0,.9)}
-  .bigplay{position:absolute;inset:0;z-index:3;display:grid;place-items:center;background:rgba(0,0,0,.25)}
-  .bigplay span{width:76px;height:76px;border-radius:50%;background:var(--accent);display:grid;place-items:center;box-shadow:0 8px 30px var(--accent-glow)}
+  .next{margin-top:3px;font-size:clamp(12px,3.4vw,17px);color:var(--dim);min-height:1.4em;text-shadow:0 1px 8px rgba(0,0,0,.9)}
+  .bigplay{position:absolute;inset:0 0 34% 0;z-index:3;display:grid;place-items:center}
+  .bigplay span{width:64px;height:64px;border-radius:50%;background:var(--accent);display:grid;place-items:center;box-shadow:0 8px 30px var(--accent-glow)}
   .bigplay svg{width:30px;height:30px;margin-left:5px;fill:#fff}
   .bigplay.hide{display:none}
 
@@ -65,7 +70,8 @@
   .like svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:2}
   .like #likeN{font-family:var(--display);font-weight:400;font-size:24px;color:var(--gold);min-width:1ch}
   .like.on #likeN{color:#fff}
-  .likeHint{margin-top:8px;font-size:13px;text-align:center;color:var(--gold);min-height:1.3em}
+  .likeHint{margin-top:8px;font-size:13px;text-align:center;color:var(--gold)}
+  .likeHint:empty{display:none}
   .like.on{background:var(--accent);border-color:var(--accent)}
   .like.on svg{fill:#fff;stroke:#fff}
   .like:active{transform:scale(.93)}
@@ -125,7 +131,14 @@
   .sync p{font-size:13px;line-height:1.6}
   .sync .tap{width:100%;margin:10px 0;padding:18px;border-radius:12px;background:var(--gold);color:#2a1200;font-weight:700;font-size:17px}
   .sync textarea{width:100%;height:110px;font:12px/1.4 ui-monospace,monospace;background:#000;color:#fff;border:1px solid var(--line);border-radius:8px;padding:8px}
-  @media (min-width:720px){.stage{aspect-ratio:16/9}.wrap{padding-top:22px}}
+  @media (min-width:720px){.stage{aspect-ratio:16/9}.wrap{padding-top:22px}.mvbar{padding:10px 12px 10px 18px}}
+  @media (max-width:480px){
+    .wrap{padding:10px 10px 48px}
+    header{padding:2px 2px 10px}
+    .player{margin-top:10px;padding:10px 12px}
+    .like{margin-top:10px;padding:13px 16px}
+    h2{margin-top:22px}
+  }
   @media (prefers-reduced-motion:reduce){.slide.on,.now.pop,.like.bump svg{animation:none}}
 </style>
 </head>
@@ -138,9 +151,12 @@
     <span class="sample">가사는 샘플입니다.</span>
   </header>
 
+  <div class="mvbar" id="mvbar">
+    <span class="lbl"><small>후보</small><b id="badgeNo"></b></span><i id="badgeStyle"></i>
+    <span class="nav"><button id="prevSong" aria-label="이전 후보"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><button id="nextSong" aria-label="다음 후보"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button></span>
+  </div>
   <section class="stage" id="stage" aria-label="가사 화면">
     <div class="slide"></div><div class="slide"></div>
-    <div class="badge" id="badge"><small>후보</small><b id="badgeNo"></b><i id="badgeStyle"></i></div>
     <div class="lyrics" aria-live="off">
       <div class="now" id="now"></div>
       <div class="next" id="next"></div>
@@ -515,7 +531,7 @@ function renderLine(force){
   if (i === lineIdx && !force) return;
   lineIdx = i;
   const L = song.lines, now = $("now"), cur = i >= 0 ? L[i][1] : "", nxt = L[i + 1] ? L[i + 1][1] : "";
-  now.textContent = i < 0 ? (audio.paused && audio.currentTime < 0.1 ? "▶ 눌러서 들어보세요" : "") : cur;
+  now.textContent = i < 0 ? (audio.paused ? "▶ 눌러서 들어보세요" : "♪") : cur;
   now.className = "now" + (cur.includes("!") && cur.length <= 6 ? " shout" : "");
   void now.offsetWidth; now.classList.add("pop");
   $("next").textContent = nxt && nxt !== "♪" ? nxt : (nxt === "♪" ? "♪ 간주" : "");
@@ -537,8 +553,8 @@ function play(){ const p = audio.play(); if (p) p.catch(() => {}); }
 function toggle(){ audio.paused ? play() : audio.pause(); }
 $("pp").onclick = toggle; $("bigplay").onclick = play;
 $("stage").addEventListener("click", e => { if (e.target.closest("#bigplay")) return; if (!audio.paused) audio.pause(); });
-audio.addEventListener("play",  () => { $("ppIcon").innerHTML = PAUSE; $("bigplay").classList.add("hide"); });
-audio.addEventListener("pause", () => { $("ppIcon").innerHTML = PLAY;  $("bigplay").classList.remove("hide"); });
+audio.addEventListener("play",  () => { $("ppIcon").innerHTML = PAUSE; $("bigplay").classList.add("hide"); renderLine(true); });
+audio.addEventListener("pause", () => { $("ppIcon").innerHTML = PLAY;  $("bigplay").classList.remove("hide"); renderLine(true); });
 audio.addEventListener("loadedmetadata", () => { $("seek").max = audio.duration; $("dur").textContent = fmt(audio.duration); });
 audio.addEventListener("timeupdate", () => {
   if (!seeking){ $("seek").value = audio.currentTime; paintSeek(); }
@@ -563,7 +579,7 @@ function renderSongs(){
     const ts = document.createElement("small"); ts.textContent = s.style; t.append(tb, ts);
     const c = document.createElement("span"); c.className = "cnt";
     c.textContent = "♥ " + count(s.id) + " · 의견 " + state.comments.filter(x => x.song_id === s.id).length;
-    b.append(no, t, c); b.onclick = () => { selectSong(s); $('stage').scrollIntoView({behavior:'smooth', block:'start'}); }; box.appendChild(b);
+    b.append(no, t, c); b.onclick = () => { selectSong(s); $('mvbar').scrollIntoView({behavior:'smooth', block:'start'}); }; box.appendChild(b);
   });
   const soon = document.createElement("div"); soon.className = "soon"; soon.textContent = "후보곡은 계속 추가됩니다"; box.appendChild(soon);
 }
@@ -586,7 +602,8 @@ function selectSong(s){
   song = s;
   if (changed){ audio.pause(); audio.src = s.src; lineIdx = -2; $("ppIcon").innerHTML = PLAY; $("bigplay").classList.remove("hide"); $("seek").value = 0; paintSeek(); $("cur").textContent = "0:00"; $("likeHint").textContent = ""; }
   document.documentElement.style.setProperty("--accent", colorOf(s)); document.documentElement.style.setProperty("--accent-glow", colorOf(s) + "8c");
-  $("badgeNo").textContent = SONGS.indexOf(s) + 1; $("badgeStyle").textContent = s.style; $("mTitle").textContent = s.title + " · " + s.style; $("mSub").textContent = "화정초 야구부 응원가";
+  const si = SONGS.indexOf(s); $("prevSong").disabled = si === 0; $("nextSong").disabled = si === SONGS.length - 1;
+  $("badgeNo").textContent = si + 1; $("badgeStyle").textContent = s.style; $("mTitle").textContent = s.title + " · " + s.style; $("mSub").textContent = "화정초 야구부 응원가";
   buildFull(); renderSongs(); renderLike(); renderComments(); renderLine(true); syncShow();
 }
 
@@ -631,6 +648,9 @@ $("syncTap").onclick = () => { if (!song.lines[syncPos]) return; song.lines[sync
 $("syncReset").onclick = () => { syncPos = 0; audio.currentTime = 0; syncShow(); };
 $("syncCopy").onclick = () => { $("syncOut").select(); try{ navigator.clipboard.writeText($("syncOut").value).then(() => { $("syncCopy").textContent = "복사됨"; }, () => {}); }catch(e){} };
 window.addEventListener("hashchange", syncShow);
+
+$("prevSong").onclick = () => { const i = SONGS.indexOf(song); if (i > 0) selectSong(SONGS[i - 1]); };
+$("nextSong").onclick = () => { const i = SONGS.indexOf(song); if (i < SONGS.length - 1) selectSong(SONGS[i + 1]); };
 
 /* ---------- start ---------- */
 selectSong(SONGS[0]);
